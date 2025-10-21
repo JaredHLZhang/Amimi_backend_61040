@@ -1,181 +1,150 @@
-# 6.104 Assignment 4: Implementing Concepts
+# Amimi Backend
 
-In this assignment, you'll begin creating your backend by implementing your concepts in TypeScript. You'll learn to use Context, a simple CLI tool and a new way to both collaborate with LLMs and drive your implementation through design.
+AI-powered relationship companion backend built with Deno, MongoDB, and Gemini AI.
 
-# Setup (Prep)
+## 🚀 Features
 
-## 0. Fork this repository
+- **Concept-Based Architecture**: Modular, reusable concepts that compose to create application features
+- **AI-Powered Chat**: Real-time conversational AI using Google's Gemini API
+- **User Pairing**: Code-based pairing system for connecting partners
+- **Content Capture**: Multi-modal content capture (audio, image, text)
+- **Visual Generation**: AI-generated visual content from text descriptions
+- **Communication Tracking**: Real-time communication interaction management
+- **Group Conversations**: Multi-user chat functionality
 
-First, [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo#forking-a-repository) this repository, and **rename** it to your desired project name, and give a description of your project.
+## 🏗️ Architecture
 
-## 1. Install Deno
+### Core Concepts
 
-[Install from Deno's website](https://deno.com)
+1. **Pairing**: User pairing and relationship management
+2. **CommunicationInteraction**: Real-time communication tracking
+3. **ContentCapture**: Multi-modal content capture and processing
+4. **VisualGeneration**: AI-powered visual content creation
+5. **ConversationalAgent**: Gemini AI-powered chat functionality
+6. **GroupConversation**: Multi-user conversation management
 
-Deno is a successor to Node.js (by the same creator, Ryan Dahl) that greatly simplifies tooling, is more secure by default, and is backwards-compatible with the larger ecosystem. Check out Deno's [extensive documentation](https://docs.deno.com/runtime/) for various helpful guides on a wide variety of common application needs and [integrations](https://docs.deno.com/examples/).
+### Synchronizations
 
-**Note:** when importing from `npm` packages, prefix with `npm:` as in: 
-```typescript
-import { MongoClient } from "npm:mongo"
-```
+Concepts compose through synchronizations to create application features:
+- Auto-capture during communication
+- Generate memory after communication
+- Contextualize agent responses
+- Initialize pair resources
+- Create shared group conversations
 
-For VSCode users, consider also installing the Deno [extension](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno) and referring to the [docs](https://docs.deno.com/runtime/reference/vscode/) if you'd like to configure behavior.
-## 2. Compile Context
+## 🛠️ Tech Stack
 
-To create a convenient binary, run the following command from the root of the directory:
-```shell
-deno compile -A --output ctx .ctx/context.ts
-```
+- **Runtime**: Deno
+- **Database**: MongoDB Atlas
+- **AI**: Google Gemini API
+- **Framework**: Custom concept-based architecture
+- **HTTP Server**: Hono
+- **Testing**: Deno Test
 
-## 3. Setup Gemini
+## 📋 Prerequisites
 
-Copy or change `.env.template` to the environment file: `.env` and insert your Gemini API key:
+- [Deno](https://deno.land/) installed
+- MongoDB Atlas cluster
+- Google Gemini API key
 
+## 🚀 Quick Start
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/JaredHLZhang/Amimi_backend_61040.git
+   cd Amimi_backend_61040
+   ```
+
+2. **Set up environment variables**
+   Create a `.env` file in the root directory:
 ```env
-GEMINI_API_KEY=YOUR_KEY_HERE
+   GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-2.5-flash
-```
-You can choose any [models](https://ai.google.dev/gemini-api/docs/models) using `GEMINI_MODEL`, such as `gemini-2.5-flash-lite` for faster responses, or `gemini-2.5-pro` for higher quality.
+   GEMINI_CONFIG=./geminiConfig.json
+   MONGODB_URL=your_mongodb_connection_string
+   DB_NAME=amimi_backend
+   ```
 
-You may also edit the `./geminiConfig.json` file to change the parameters according to any of the [GenerationConfig](https://ai.google.dev/api/generate-content#v1beta.GenerationConfig) options, including turning on/off thinking, limiting tokens, etc.
+3. **Install dependencies and start the server**
+   ```bash
+   deno task concepts
+   ```
 
-## 4. Setup your MongoDB Atlas Cluster (free)
+The server will start on `http://localhost:8000` with API endpoints at `/api/*`.
 
-For this project, we'll be using MongoDB as the database. To get started, use either the slides or the instructions:
-### Slides
-[MongoDB Setup](https://docs.google.com/presentation/d/1DBOWIQ2AAGQPDRgmnad8wN9S9M955LcHYZQlnbu-QCs/edit?usp=sharing)
-### Instructions
-1. Create your [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) account.
-2. When selecting a template, choose the __free__ option, M0.
-4. At the Security Quickstart page, select how you want to authenticate your connection and keep the rest of the defaults. Make sure to allow access to all IPs as shown in [this slide](https://docs.google.com/presentation/d/1DBOWIQ2AAGQPDRgmnad8wN9S9M955LcHYZQlnbu-QCs/edit?usp=sharing).
-5. Once created, click the __CONNECT__ button, select __driver__, and copy the srv connection string. If using username and password, the url should look something like this: `mongodb+srv://<username>:<password>@cluster0.p82ijqd.mongodb.net/?retryWrites=true&w=majority`. Make sure to replace username and password with your actual values.
-6. Add your connection url (without `<` and `>`) to `MONGODB_URL=<connection url>` to your `.env` file. 
-7. Give your database a name under `DB_NAME=<your database name>`.
+## 📚 API Endpoints
 
-## 5. Install Obsidian
+### Pairing
+- `POST /api/Pairing/generateCode` - Generate pairing code
+- `POST /api/Pairing/acceptPairing` - Accept pairing code
+- `POST /api/Pairing/dissolvePair` - Dissolve pair
+- `POST /api/Pairing/getPair` - Get pair information
+- `POST /api/Pairing/isPaired` - Check if user is paired
 
-[Obsidian](https://obsidian.md)
+### ConversationalAgent
+- `POST /api/ConversationalAgent/createConversation` - Create new conversation
+- `POST /api/ConversationalAgent/sendUserMessage` - Send user message
+- `POST /api/ConversationalAgent/getAgentResponse` - Get AI response
+- `POST /api/ConversationalAgent/getHistory` - Get conversation history
+- `POST /api/ConversationalAgent/updateContext` - Update conversation context
+- `POST /api/ConversationalAgent/deleteConversation` - Delete conversation
 
-Obsidian is an open-source Markdown editor and personal knowledge management solution. The Context tool **does not** require use of Obsidian, and you may use any preferred editor, but we highly recommend using Obsidian to navigate your assignment and the generated context to write, view, and structure your prompts and design documents. 
+### ContentCapture
+- `POST /api/ContentCapture/startCapture` - Start content capture
+- `POST /api/ContentCapture/stopCapture` - Stop content capture
+- `POST /api/ContentCapture/getCapture` - Get capture details
+- `POST /api/ContentCapture/getCapturesBySource` - Get captures by source
+- `POST /api/ContentCapture/deleteCapture` - Delete capture
 
-### Link settings
+### VisualGeneration
+- `POST /api/VisualGeneration/generateVisual` - Generate visual content
+- `POST /api/VisualGeneration/getVisual` - Get visual details
+- `POST /api/VisualGeneration/regenerateVisual` - Regenerate visual
+- `POST /api/VisualGeneration/deleteVisual` - Delete visual
+- `POST /api/VisualGeneration/getUserVisuals` - Get user's visuals
 
-This should be correctly set already, but under Obsidian -> Settings -> Files and links, make sure that:
-1. `New link format` is set to `Relative path to file`
-2. `Use [[Wikilinks]]` is disabled
-3. `Detect all file extensions` is enabled (so you can easily view code and drop links to code files)
+### CommunicationInteraction
+- `POST /api/CommunicationInteraction/startInteraction` - Start communication
+- `POST /api/CommunicationInteraction/endInteraction` - End communication
+- `POST /api/CommunicationInteraction/getActiveInteraction` - Get active interaction
+- `POST /api/CommunicationInteraction/getInteractionDuration` - Get duration
+- `POST /api/CommunicationInteraction/getInteractionHistory` - Get history
 
-![](media/obsidian_settings.png)
+### GroupConversation
+- `POST /api/GroupConversation/createGroupConversation` - Create group chat
+- `POST /api/GroupConversation/addParticipant` - Add participant
+- `POST /api/GroupConversation/sendMessage` - Send group message
+- `POST /api/GroupConversation/getAgentResponse` - Get AI response
+- `POST /api/GroupConversation/getHistory` - Get group history
+- `POST /api/GroupConversation/updateContext` - Update context
+- `POST /api/GroupConversation/deleteConversation` - Delete group chat
 
-# Exercise 0 
+## 🧪 Testing
 
-Context is a simple Markdown-based framework for building design knowledge and collaborating with an LLM. There is no additional syntax: any text-based repository with code of any language with documentation written as Markdown is compatible.
-
-## 0. Note
-
-**Important:** do not delete or modify anything from the `context` directory. Content is hashed by ID, meaning that corruption can be detected, but not recovered from automatically. This pairs nicely with git in case you mess up, so don't forget to commit once in a while!
-
-## 1. Getting started with Context
-
-Context allows you to treat any Markdown document as a conversation with an LLM: everything in the document is exactly what both you and the LLM sees. Each step is broken up by `# Heading 1` sections, and you should begin every new prompt or chunk of interesting information using a new section 1 heading. 
-
-### Task:
-
-In `design/brainstorming/questioning.md`, complete the `# prompt: Why ... ?` with your burning question for the universe. Then, from the root of the repository, run this command in the terminal (if you're using Obsidian, you should be able to copy the command by clicking on `Shell` in the top right):
-
-```shell
-./ctx prompt design/brainstorming/questioning.md
-```
-
-You should see any thinking appear in the terminal, with the rest of the completion streamed into the file. In general, you can `prompt` a LLM to chime in with 
-
-```shell
-./ctx prompt <path_to_file>.md
-```
-
-where `<path_to_file>` is also a link **relative to the root** of the repository.
-
-## 2. Including context
-
-You can **include** other documents to embed their contents, allowing you to compose exactly the context that you want. In Obsidian's file explorer on the left, expand the `design/background` and `design/learning` folders, then click on `understanding-concepts`. This should open a blank document.
-
-### Task:
-
-Drag and drop `concept-design-overview` into the body of `understanding-concepts`. This should show up as a normal link. Then, to make it a link that Context will include, simply add the `@` sign to the beginning of the link text (the part in the brackets), like so:
-
-![](media/linking.png)
-
-**Important:** includes should be on their own paragraph - make sure that there's an empty line between them and other content. 
-
-Next, type `# question: ...` and fill in any question you have about concepts, then prompt through Context. 
-
-**Tip:** you can easily get the relative link you need to paste into a terminal after `./ctx prompt` by right/ctrl clicking the file in the explorer directly:
-
-![](media/relative_linking.png)
-
-## 3. Viewing context
-
-The `context` directory is an immutable and complete history of every file that the tool interacts with - this means that you shouldn't be afraid of editing or deleting files! This directory is a mirror of the rest of the repository, just nested one layer deeper. In addition, files such as `understanding-concepts.md` become a directory, as in `understanding-concepts.md/` and contain a timestamped version of its entire history. 
-
-### Context folders
-
-Each Markdown file within these directories have the format `timestamp.hash_id.md`, where the `hash_id` is a **content-based hash** that helps you identify, across the entire repository, usages of the same document or content. 
-
-### Individual steps
-
-Inside the `steps` directory one layer deeper are granular files of the form `step.hash_id.md` that contain all the unique steps (`# heading 1` blocks) ever present in the file. This helps identify at-a-glance what the contents of each document are, such as prompts or responses. By default, the `step` in the file name is a `_` character, unless the heading contains a prefix of the form `# prefix: ...`, which can be a useful way to break up a document (that you can follow yourself, or prompt an LLM to do so).
-
-**Important:** this is the reason for the previous warning about not modifying the `context` directory. The content-based hashes means we can detect such edits/deletes, but the more important point is that you keep a legible history of your design choices and explorations (which can be invaluable for prompting!)
-
-### Task:
-
-1. Consider again `design/brainstorming/questioning`, and **find** the version of the document in `context` containing the LLM's response. Note that `ctx prompt` will save both a before and after version. Drag or insert a link to this in `design/learning/exercise-0`
-2. Go back to `questioning`, and **edit** the response to put in your own typed answer. **Tip:** you can collapse the entire response heading (hover to the left of the heading, and click the downwards arrow) and select it quickly to delete the entire block.
-3. Use `./ctx save <link_to_questioning.md>` to manually **save** the file to `context`, then find the updated version and link to it in the `exercise-0` document.
-4. Use Context to save `exercise-0` as well. (Optional): delete any of these files - if you've properly saved/prompted, we'll be able to find it in the context. We encourage you to continue to prompt/save your brainstorming and learning, and they will help with finding interesting moments for your assignment!
-
-**Note:** `ctx save` is only necessary if you manually edit files, such as your second response to `questioning` or your solutions that you copy paste into `exercise-0`. Any time you `ctx prompt`, both the before and after versions are automatically saved.
-# Implementing concepts
-
-You're now ready to create the context that you need to implement concepts with (or without) the aid of an LLM! We've provided you with a number of documents/prompts in `design/background`, each its own self-contained bit of knowledge about concept design in general and implementing them in TypeScript. 
-
-- `design/background`: Background knowledge that you should treat as both prompts and documentation for you to read about concept design. Feel free to add any additional background documents that you think are good prompts. Also, if you think you can contribute, you may also edit any existing prompts and point them out!
-- `design/brainstorm`: Plan, chat with an LLM, use as a scratch pad - create and synthesize context about your potential ideas.
-- `design/concepts`: Place your actual concept spec documents here. Feel free to copy a whole document from `brainstorm` if you started there and trim down, or simply mutate in place (with `ctx prompt` or `ctx save` throughout).
-- `design/learning`: When you feel like you've learned something significant, such as important decisions or caveats/challenges you encounter, record them here. **Tip:** you can always copy an entire document from another place (like `brainstorm`), add a `# summarize: extract the important lessons from everything above`, followed by a `ctx prompt`, then simply delete the original parts.
-
-### Task:
-
-Implement your concepts, either using LLM assistance through `ctx prompt`, or implementing by hand and documenting your progress with `ctx save`. The following tips may help:
-
-### Sample concept: LikertSurvey
-
-We've included a sample concept called LikertSurvey. This is a different version than shown in lecture, where the specification itself was also completely generated. You can inspect `design/concepts/LikertSurvey` to see exactly how this was done, and its history in `context`. This concept is saved, so feel free to delete the design or the source code (useful to delete at least the testing file to prevent it from running when you execute all tests). 
-
-**Generated concept:** notice that `LikertSurvey/LikertSurvey.md` is actually a link pointing to the specific **step** of that previous generation in the context! This is also an embedded link, meaning that Obsidian previews it for you automatically. You can upgrade any link to an embedded link by putting an `!` in front of it, and as long as you still have the `@` sign in the link text, Context will treat it as an include all the same.
-
-### Implementation
-
-Look around the background folder and see which might help you implement concepts, depending on how much of an existing design you already have. The `LikertSurvey/implementation` document gives one example of how this was done. The file that contains most of the information about the technical details of concept implementations is `implementing-concepts.md`.
-### Testing
-
-You can read about testing in `testing-concepts.md`. In general, we're using all the standard options, and for testing the current prompts use the [Deno testing framework](https://docs.deno.com/runtime/fundamentals/testing/). Tests are defined by any file with the name `filename.test.ts` in your directory. To run all tests, simply run:
-
-```shell
-deno test -A
+Run the test suite:
+```bash
+deno test --allow-net --allow-read --allow-sys --allow-env
 ```
 
-where the `-A` flag means to give all permissions. Be careful with this - it's convenient, but Deno's default security model helps you find if a package you import is sneakily trying to do something your program doesn't (like load local files). There's plenty of [documentation](https://docs.deno.com/runtime/fundamentals/security/) about a more scoped approach to this.
+## 📖 Documentation
 
-**Confirming your setup:** run the command above to make sure that you've configured everything correctly. You should see in your MongoDB Atlas console the created collections in the test database! These are temporary and will be wiped every time you start a new test.
-### Tips for including code
+- [Concept Design Brief](design/background/concept-design-brief.md)
+- [API Specification](design/api-spec.md)
+- [Synchronizations](design/synchronizations.md)
+- [Implementation Summary](design/implementation-summary.md)
 
-Since `.ts` files don't show up in Obsidian, VSCode has a similar option where you can right/ctrl click a code file, and `Copy Relative Path` to get a repo-based link to include in your context. 
+## 🤝 Contributing
 
-Context understands both the relative links generated by default when dragging files in Obsidian, as well as repo-based links. When you copy-paste these kinds of links from outside sources, you'll need to additionally prepend the link with a `/` to tell Context that it should look it up from the repo root:
-```md
-[@MyConceptImplementation](/src/concepts/MyConcept.ts)
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
 
-This also turns out to be the same convention that Github uses, so you'll be able to navigate your links there too!
+## 📄 License
 
+This project is licensed under the MIT License.
+
+## 🔗 Related Projects
+
+- [Amimi Frontend](https://github.com/JaredHLZhang/Amimi-frontend_61040) - Vue.js frontend application
