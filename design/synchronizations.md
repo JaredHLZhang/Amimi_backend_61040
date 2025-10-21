@@ -78,6 +78,20 @@ then
 
 ---
 
+## Sync 5: Initialize Shared Conversation for Pair
+
+```
+sync InitializeSharedConversation
+when
+    Pairing.acceptPairing(user, code) creates pair p
+then
+    GroupConversation.createGroupConversation({p.user1, p.user2}, "paired_shared_context")
+
+Purpose: When users pair, create a shared group conversation where both can chat with Amimi together.
+```
+
+---
+
 ## Feature Composition
 
 These syncs compose the concepts to create Amimi's main features:
@@ -98,4 +112,9 @@ These syncs compose the concepts to create Amimi's main features:
 - `ContentCapture` provides relationship context
 - `Pairing` identifies the couple
 - Syncs 3 & 4 coordinate context and initialization
+
+### Feature: Shared Group Chat
+- `GroupConversation` provides multi-user chat functionality
+- `Pairing` identifies the couple
+- Sync 5 coordinates shared conversation creation
 

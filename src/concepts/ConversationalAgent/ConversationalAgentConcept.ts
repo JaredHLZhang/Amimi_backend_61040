@@ -2,6 +2,7 @@
 
 import { Collection, Db, ObjectId } from 'npm:mongodb';
 import { ID } from '@utils/types.ts';
+import { geminiService } from '@utils/gemini.ts';
 
 // --- Type Definitions ---
 
@@ -176,8 +177,7 @@ export default class ConversationalAgentConcept {
   }
 
   /**
-   * Generates a placeholder AI response to a user message and records it in the conversation history.
-   * In a real application, this would involve calling an external LLM API.
+   * Generates an AI response using Gemini to a user message and records it in the conversation history.
    *
    * @param params - Parameters object.
    * @param params.conversationId - The ID of the conversation (as string).
@@ -202,21 +202,35 @@ export default class ConversationalAgentConcept {
       return { status: 'error', error: 'Conversation not found.' };
     }
 
-    // Placeholder AI response logic
-    // In a real scenario, this would involve calling an LLM API,
-    // potentially using `conversation.context` and previous messages from `getHistory`.
-    const agentResponseContent = `Thank you for your message: '${userMessageContent}'. How can I assist you today?`;
-
-    const messageId = new ObjectId(); // Pre-generate ObjectId
-    const agentMessage: MessageDocument = {
-      _id: messageId,
-      conversationId: convObjId,
-      isFromUser: false,
-      content: agentResponseContent,
-      timestamp: new Date(),
-    };
-
     try {
+      // Get conversation history for context
+      const historyResult = await this.getHistory({ conversationId });
+      if (historyResult.status === 'error') {
+        return { status: 'error', error: `Failed to get conversation history: ${historyResult.error}` };
+      }
+
+      // Convert message history to the format expected by Gemini
+      const conversationHistory = historyResult.messages.map(msg => ({
+        isFromUser: msg.isFromUser,
+        content: msg.content
+      }));
+
+      // Generate AI response using Gemini
+      const agentResponseContent = await geminiService.generateResponse(
+        userMessageContent,
+        conversationHistory,
+        conversation.context
+      );
+
+      const messageId = new ObjectId(); // Pre-generate ObjectId
+      const agentMessage: MessageDocument = {
+        _id: messageId,
+        conversationId: convObjId,
+        isFromUser: false,
+        content: agentResponseContent,
+        timestamp: new Date(),
+      };
+
       const result = await this.messagesCollection.insertOne(agentMessage);
       if (!result.acknowledged) {
         return { status: 'error', error: 'Failed to save agent response to the database.' };
@@ -224,7 +238,28 @@ export default class ConversationalAgentConcept {
       return { status: 'success', message: agentMessage };
     } catch (error: unknown) {
       console.error('Error getting agent response:', error);
-      return { status: 'error', error: `Database error during getAgentResponse: ${error instanceof Error ? error.message : String(error)}` };
+      
+      // Fallback to a simple response if Gemini fails
+      const fallbackResponse = "I'm sorry, I'm having trouble responding right now. Please try again in a moment.";
+      const messageId = new ObjectId();
+      const fallbackMessage: MessageDocument = {
+        _id: messageId,
+        conversationId: convObjId,
+        isFromUser: false,
+        content: fallbackResponse,
+        timestamp: new Date(),
+      };
+
+      try {
+        const result = await this.messagesCollection.insertOne(fallbackMessage);
+        if (result.acknowledged) {
+          return { status: 'success', message: fallbackMessage };
+        }
+      } catch (dbError) {
+        console.error('Error saving fallback message:', dbError);
+      }
+
+      return { status: 'error', error: `Failed to generate AI response: ${error instanceof Error ? error.message : String(error)}` };
     }
   }
 

@@ -1,4 +1,5 @@
 import { Hono } from "jsr:@hono/hono";
+import { cors } from "jsr:@hono/hono/cors";
 import { getDb } from "@utils/database.ts";
 import { walk } from "jsr:@std/fs";
 import { parseArgs } from "jsr:@std/cli/parse-args";
@@ -23,6 +24,13 @@ const CONCEPTS_DIR = "src/concepts";
 async function main() {
   const [db] = await getDb();
   const app = new Hono();
+
+  // Add CORS middleware
+  app.use("*", cors({
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+  }));
 
   app.get("/", (c) => c.text("Concept Server is running."));
 
