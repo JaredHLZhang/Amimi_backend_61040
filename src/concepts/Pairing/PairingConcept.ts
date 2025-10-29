@@ -41,6 +41,7 @@ interface PairDocument {
   code: PairingCode; // The specific code used to form this pairing
   active: boolean; // True if the pair is currently active, false if dissolved
   createdAt: Date; // Timestamp when the pair was created
+  sharedConversationId?: string; // Optional ID for the shared group conversation
 }
 
 export default class PairingConcept {
@@ -152,6 +153,29 @@ export default class PairingConcept {
       // Atomically insert the new pair and remove the pending code
       await this.pairs.insertOne(newPair);
       await this.pendingCodes.deleteOne({ _id: code });
+      
+      // Create shared group conversation for the paired users
+      try {
+        const GroupConversationConcept = (await import("../GroupConversation/GroupConversationConcept.ts")).default;
+        const groupConcept = new GroupConversationConcept(this.db);
+        const createConversationResult = await groupConcept.createGroupConversation({
+          participants: [generatorUser, user],
+          context: "Long-distance couple seeking relationship support and connection"
+        });
+        
+        if (createConversationResult.status === 'success') {
+          // Update the pair document with shared conversation ID
+          await this.pairs.updateOne(
+            { _id: newPairId },
+            { $set: { sharedConversationId: createConversationResult.conversation.conversationId } }
+          );
+          console.log(`Created shared conversation ${createConversationResult.conversation.conversationId} for pair ${newPairId}`);
+        }
+      } catch (syncError) {
+        console.error('Failed to create shared conversation during pairing:', syncError);
+        // Don't fail the pairing if conversation creation fails
+      }
+      
       return { pair: newPairId };
     } catch (e: any) {
       // Handle potential race conditions where unique constraints might be violated
@@ -206,7 +230,7 @@ export default class PairingConcept {
    *
    * **effects**: Returns the ID of the active pair that includes the specified user.
    */
-  async getPair({ user }: { user: User }): Promise<{ pair: PairId } | { error: string }> {
+  async getPair({ user }: { user: User }): Promise<{ pair: PairId; sharedConversationId?: string; partner: User } | { error: string }> {
     // Find an active pair where the user is either user1 or user2
     const activePair = await this.pairs.findOne({ $or: [{ user1: user }, { user2: user }], active: true });
 
@@ -214,7 +238,14 @@ export default class PairingConcept {
       return { error: `User ${user} is not currently in an active pair.` };
     }
 
-    return { pair: activePair._id }; // Return the ID of the found pair
+    // Determine partner's ID
+    const partner = activePair.user1 === user ? activePair.user2 : activePair.user1;
+
+    return { 
+      pair: activePair._id,
+      sharedConversationId: activePair.sharedConversationId,
+      partner: partner
+    };
   }
 
   /**

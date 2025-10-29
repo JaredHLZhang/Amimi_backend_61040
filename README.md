@@ -8,7 +8,6 @@ AI-powered relationship companion backend built with Deno, MongoDB, and Gemini A
 - **AI-Powered Chat**: Real-time conversational AI using Google's Gemini API
 - **User Pairing**: Code-based pairing system for connecting partners
 - **Content Capture**: Multi-modal content capture (audio, image, text)
-- **Visual Generation**: AI-generated visual content from text descriptions
 - **Communication Tracking**: Real-time communication interaction management
 - **Group Conversations**: Multi-user chat functionality
 
@@ -19,9 +18,8 @@ AI-powered relationship companion backend built with Deno, MongoDB, and Gemini A
 1. **Pairing**: User pairing and relationship management
 2. **CommunicationInteraction**: Real-time communication tracking
 3. **ContentCapture**: Multi-modal content capture and processing
-4. **VisualGeneration**: AI-powered visual content creation
-5. **ConversationalAgent**: Gemini AI-powered chat functionality
-6. **GroupConversation**: Multi-user conversation management
+4. **ConversationalAgent**: Gemini AI-powered chat functionality
+5. **GroupConversation**: Multi-user conversation management
 
 ### Synchronizations
 
@@ -96,13 +94,6 @@ The server will start on `http://localhost:8000` with API endpoints at `/api/*`.
 - `POST /api/ContentCapture/getCapturesBySource` - Get captures by source
 - `POST /api/ContentCapture/deleteCapture` - Delete capture
 
-### VisualGeneration
-- `POST /api/VisualGeneration/generateVisual` - Generate visual content
-- `POST /api/VisualGeneration/getVisual` - Get visual details
-- `POST /api/VisualGeneration/regenerateVisual` - Regenerate visual
-- `POST /api/VisualGeneration/deleteVisual` - Delete visual
-- `POST /api/VisualGeneration/getUserVisuals` - Get user's visuals
-
 ### CommunicationInteraction
 - `POST /api/CommunicationInteraction/startInteraction` - Start communication
 - `POST /api/CommunicationInteraction/endInteraction` - End communication
@@ -132,6 +123,57 @@ deno test --allow-net --allow-read --allow-sys --allow-env
 - [API Specification](design/api-spec.md)
 - [Synchronizations](design/synchronizations.md)
 - [Implementation Summary](design/implementation-summary.md)
+- [**Design Changes Summary**](design/changes-summary.md) - Summary of major changes during implementation
+
+## 📋 Assignment 2 Submission Files
+
+All required files for Assignment 2 submission are located in the following locations:
+
+### Required Documents
+
+1. **Design Changes Summary** - [design/changes-summary.md](design/changes-summary.md)
+   - Documents major changes from original design
+   - Describes GroupConversation addition
+   - Explains Gemini AI integration
+   - Notes synchronization changes
+
+2. **API Specification** - [design/api-spec.md](design/api-spec.md)
+   - Complete API documentation for all endpoints
+   - Request/response formats
+   - Error handling specifications
+
+3. **Concept Designs** - [design/concepts/](design/concepts/)
+   - [Pairing](design/concepts/Pairing/Pairing.md)
+   - [ConversationalAgent](design/concepts/ConversationalAgent/ConversationalAgent.md)
+   - [GroupConversation](design/concepts/GroupConversation/GroupConversation.md)
+   - [CommunicationInteraction](design/concepts/CommunicationInteraction/CommunicationInteraction.md)
+   - [ContentCapture](design/concepts/ContentCapture/ContentCapture.md)
+   - Note: VisualGeneration and LikertSurvey exist in design documents but were not implemented in the MVP
+
+4. **Synchronizations** - [design/synchronizations.md](design/synchronizations.md)
+   - Rules for how concepts interact
+   - Composition patterns
+
+5. **Background Documentation** - [design/background/](design/background/)
+   - [Concept Design Brief](design/background/concept-design-brief.md)
+   - [Concept Design Overview](design/background/concept-design-overview.md)
+   - [Concept Specifications](design/background/concept-specifications.md)
+   - [Implementing Concepts](design/background/implementing-concepts.md)
+   - [Testing Concepts](design/background/testing-concepts.md)
+
+### Implementation Files
+
+- **Source Code**: [src/concepts/](src/concepts/)
+- **Concept Server**: [src/concept_server.ts](src/concept_server.ts)
+- **Utilities**: [src/utils/](src/utils/)
+  - [database.ts](src/utils/database.ts)
+  - [gemini.ts](src/utils/gemini.ts) - Gemini AI integration
+  - [types.ts](src/utils/types.ts)
+
+### Testing
+
+- All test files: [src/concepts/*/Concept.test.ts](src/concepts/)
+- Run tests: `deno test --allow-net --allow-read --allow-sys --allow-env`
 
 ## 🤝 Contributing
 
