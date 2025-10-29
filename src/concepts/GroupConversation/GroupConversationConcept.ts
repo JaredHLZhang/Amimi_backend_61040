@@ -1,5 +1,6 @@
 import { Collection, Db, ObjectId } from 'npm:mongodb';
 import { ID } from '../../utils/types.ts';
+import { geminiService } from '@utils/gemini.ts';
 
 // --- Type Definitions ---
 
@@ -293,15 +294,24 @@ export class GroupConversationConcept {
         return { status: 'error', error: 'Conversation not found.' };
       }
 
-      // Get recent message history for context
-      const recentMessages = await this.groupMessages
-        .find({ conversationId: objectId })
-        .sort({ timestamp: -1 })
-        .limit(10)
-        .toArray();
+      // Get conversation history for context
+      const historyResult = await this.getHistory({ conversationId });
+      if (historyResult.status === 'error') {
+        return { status: 'error', error: `Failed to get conversation history: ${historyResult.error}` };
+      }
 
-      // Simulate AI agent response (in real implementation, this would call an AI service)
-      const agentResponse = `I understand the context: "${contextPrompt}". Based on our conversation history, I'm here to help with your relationship journey. How can I assist you both today?`;
+      // Convert message history to the format expected by Gemini
+      const conversationHistory = historyResult.messages.map(msg => ({
+        isFromUser: !msg.isFromAgent,
+        content: `${msg.isFromAgent ? 'Amimi' : 'User'}: ${msg.content}`
+      }));
+
+      // Generate AI response using Gemini with shared response method
+      const agentResponseContent = await geminiService.generateSharedResponse(
+        contextPrompt,
+        conversationHistory,
+        `Shared conversation for couple with ${conversation.participants.length} participants. ${conversation.context}`
+      );
 
       const messageId = new ObjectId();
       const agentMessage: GroupMessageDocument = {
@@ -309,23 +319,45 @@ export class GroupConversationConcept {
         conversationId: objectId,
         sender: 'amimi-agent' as ID,
         isFromAgent: true,
-        content: agentResponse,
+        content: agentResponseContent,
         timestamp: new Date(),
       };
 
       const result = await this.groupMessages.insertOne(agentMessage);
 
       if (!result.acknowledged) {
-        return { status: 'error', error: 'Failed to generate agent response.' };
+        return { status: 'error', error: 'Failed to save agent response to the database.' };
       }
 
       return {
         status: 'success',
         message: GroupConversationConcept.mapDocumentToGroupMessage(agentMessage),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error getting agent response:', error);
-      return { status: 'error', error: `Database error: ${error.message}` };
+      
+      // Fallback to a simple response if Gemini fails
+      const fallbackResponse = "I'm sorry, I'm having trouble responding right now. Please try again in a moment.";
+      const messageId = new ObjectId();
+      const fallbackMessage: GroupMessageDocument = {
+        _id: messageId,
+        conversationId: new ObjectId(conversationId),
+        sender: 'amimi-agent' as ID,
+        isFromAgent: true,
+        content: fallbackResponse,
+        timestamp: new Date(),
+      };
+
+      try {
+        const result = await this.groupMessages.insertOne(fallbackMessage);
+        if (result.acknowledged) {
+          return { status: 'success', message: GroupConversationConcept.mapDocumentToGroupMessage(fallbackMessage) };
+        }
+      } catch (dbError) {
+        console.error('Error saving fallback message:', dbError);
+      }
+
+      return { status: 'error', error: `Failed to generate AI response: ${error instanceof Error ? error.message : String(error)}` };
     }
   }
 
