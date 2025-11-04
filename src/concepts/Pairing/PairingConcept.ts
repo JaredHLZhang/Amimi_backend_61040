@@ -258,5 +258,26 @@ export default class PairingConcept {
     const activePair = await this.pairs.findOne({ $or: [{ user1: user }, { user2: user }], active: true });
     return !!activePair; // Convert truthiness to boolean
   }
+
+  /**
+   * updateSharedConversation (pair: PairId, conversationId: String): (pair: PairId)
+   *
+   * **requires**:
+   *   - `pair` exists and is active
+   *
+   * **effects**: Updates the pair document with the shared conversation ID
+   */
+  async updateSharedConversation({ pair, conversationId }: { pair: PairId; conversationId: string }): Promise<{ pair: PairId } | { error: string }> {
+    const result = await this.pairs.updateOne(
+      { _id: pair },
+      { $set: { sharedConversationId: conversationId } }
+    );
+    
+    if (result.matchedCount === 0) {
+      return { error: `Pair ${pair} not found` };
+    }
+    
+    return { pair };
+  }
 }
 

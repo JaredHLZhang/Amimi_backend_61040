@@ -63,12 +63,41 @@ GEMINI_MODEL=gemini-2.5-flash
    DB_NAME=amimi_backend
    ```
 
-3. **Install dependencies and start the server**
+3. **Build and start the server**
    ```bash
-   deno task concepts
+   deno task build  # Generate concept and sync imports
+   deno task start  # Start server with sync engine
    ```
 
 The server will start on `http://localhost:8000` with API endpoints at `/api/*`.
+
+**Note**: Use `deno task concepts` to start the old concept server without sync engine.
+
+## 🎯 Assignment 4C: Synchronization Engine
+
+### Authentication
+
+Added email/password authentication using the Sessioning concept:
+
+- `POST /api/Sessioning/register` - Register new user
+- `POST /api/Sessioning/login` - Login with email/password
+- `POST /api/Sessioning/logout` - Logout and invalidate session
+- `POST /api/Sessioning/getUser` - Get user from session (protected)
+- `POST /api/Sessioning/validateSession` - Validate session (protected)
+
+All protected endpoints require a valid session token in the request body.
+
+### Synchronizations
+
+Backend uses the sync engine for declarative orchestration:
+
+- **auth.sync.ts**: Session validation for all protected endpoints
+- **amimi.sync.ts**: Auto-trigger AI responses when users mention @Amimi
+- **pairing.sync.ts**: Auto-create shared conversations on pairing
+
+### Design Changes
+
+See [design/assignment4c-changes.md](design/assignment4c-changes.md) for complete documentation of Assignment 4C changes.
 
 ## 📚 API Endpoints
 
