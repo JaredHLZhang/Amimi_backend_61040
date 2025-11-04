@@ -1,5 +1,14 @@
 # Amimi Backend
 
+## Backend Console Trace For Assignment 4C
+
+**Backend Console Trace** - [backend-trace.txt](backend-trace.txt)
+- Complete trace of incoming actions to the backend during video demonstration
+- Captured from Render dashboard console logs
+- Shows all API requests, synchronizations, and responses
+- Demonstrates authentication, pairing, conversation creation, message sending, and @Amimi mention triggering
+- Includes timestamps and full action traces showing the sync engine in action
+
 AI-powered relationship companion backend built with Deno, MongoDB, and Gemini AI.
 
 ## 🚀 Features
